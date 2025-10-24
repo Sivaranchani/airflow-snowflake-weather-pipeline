@@ -13,9 +13,9 @@ API_KEY = 'cb6f258472a6600efcf5574c4608cd5b'
 CITIES = ['Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Tiruchirappalli']
 
 # Snowflake
-SNOWFLAKE_USER = 'sivaranchani'
-SNOWFLAKE_PASSWORD = 'Sivaranchani@123'
-SNOWFLAKE_ACCOUNT = 'ucozpth-ph46898' # e.g., abc12345.ap-south-1
+SNOWFLAKE_USER = '*************'# {replace with the username}
+SNOWFLAKE_PASSWORD = 'Siva**********@123' #{replace with the password}
+SNOWFLAKE_ACCOUNT = '*****-ph46898' # {replace with the account}e.g., abc12345.ap-south-1
 SNOWFLAKE_WAREHOUSE = 'COMPUTE_WH'
 SNOWFLAKE_DATABASE = 'WEATHER_DB'
 SNOWFLAKE_SCHEMA = 'PIPELINE'
