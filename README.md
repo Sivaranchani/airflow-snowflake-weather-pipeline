@@ -1,90 +1,115 @@
-Automated Weather Data ETL Pipeline with Airflow and Snowflake
+🌦️ Automated Weather Data ETL Pipeline with Airflow and Snowflake ❄️
 
-Project Overview
+🎯 Project Overview
 
 This project demonstrates a complete Extract, Transform, Load (ETL) pipeline built to automatically fetch real-time weather data for selected cities, clean it, and load it into a Snowflake cloud data warehouse. The entire workflow is orchestrated using Apache Airflow.
 
-Technologies Used
+🛠️ Technologies Used
 
-Python: Core programming language for scripting.
+Core: Python, Pandas, Snowflake, Apache Airflow
 
-Requests: For fetching data from the OpenWeatherMap API.
+Data Source: OpenWeatherMap API
 
-Pandas: For data transformation and structuring.
+Connectivity: Requests, snowflake-connector-python
 
-Snowflake: Cloud data warehouse for final data storage.
+Environment: WSL (Ubuntu), Python Virtual Environment
 
-snowflake-connector-python: To connect Python scripts to Snowflake.
+Version Control: Git, GitHub
 
-Apache Airflow: For workflow automation, scheduling, and monitoring.
-
-WSL (Ubuntu): Linux environment for running Apache Airflow.
-
-Git & GitHub: For version control and code sharing.
-
-How it Works
+⚙️ How it Works
 
 The pipeline consists of three main tasks orchestrated by Airflow:
 
-Extract: A Python function (extract) uses the OpenWeatherMap API to fetch current weather data (temperature, humidity, description) for predefined cities (Chennai, Mumbai, Delhi, Bangalore, Tiruchirappalli). The raw JSON data is passed to the next task.
+Extract:
 
-Transform: A Python function (transform) receives the raw JSON data, parses it, cleans it (e.g., converts temperature from Kelvin to Celsius), adds a UTC timestamp, and structures it into a Pandas DataFrame. The cleaned DataFrame is then passed to the next task.
+Fetches current weather data (temperature, humidity, description) via OpenWeatherMap API using requests.
 
-Load: A Python function (load) connects to the specified Snowflake database, takes the cleaned Pandas DataFrame, and appends the data into the DAILY_WEATHER table using the write_pandas utility.
+Handles API responses and basic error checking.
+
+Passes raw data as a JSON string to the next task via Airflow XComs.
+
+Transform :
+
+Receives the JSON string, parses it back into Python objects.
+
+Cleans the data (e.g., converts temperature Kelvin -> Celsius).
+
+Adds a UTC timestamp using Python's datetime.
+
+Structures the data into a Pandas DataFrame.
+
+Passes the cleaned DataFrame as a JSON string via Airflow XComs.
+
+Load :
+
+Receives the cleaned data JSON string, converts it back to a Pandas DataFrame.
+
+Connects to the specified Snowflake database using snowflake-connector-python.
+
+Appends the DataFrame to the target DAILY_WEATHER table using write_pandas.
+
+Includes error handling for the database connection and loading process.
 
 The entire process is defined as an Airflow DAG (weather_etl_pipeline) scheduled to run daily (@daily).
 
-Airflow Orchestration
+📊 Airflow Orchestration
 
-The pipeline is managed via the Apache Airflow UI.
+The pipeline's execution, scheduling, and monitoring are managed via the Apache Airflow UI.
 
-(Airflow UI showing the weather_etl_pipeline DAG with successful task runs)
+<img width="1920" height="1080" alt="Screenshot 2025-10-24 094425" src="https://github.com/user-attachments/assets/766a2cce-6449-41d6-aa36-7dabeb1f3a36" />
 
-Snowflake Data Warehouse
 
-The final, clean data resides in the DAILY_WEATHER table within Snowflake.
+💾 Snowflake Data Warehouse
 
-(Snowflake worksheet displaying the data loaded into the DAILY_WEATHER table)
+The final, clean, and structured weather data is stored in the DAILY_WEATHER table within the specified Snowflake database and schema.
 
-Setup
+<img width="1483" height="348" alt="Screenshot 2025-10-24 094611" src="https://github.com/user-attachments/assets/1201b77f-9635-41b0-990d-c94bae126434" />
+
+
+🚀 Setup & Installation
 
 Prerequisites: Python 3.x, pip, Git.
 
-Clone Repository: git clone <your-repository-url>
+Snowflake Setup:
 
-Install Dependencies:
+Log in to your Snowflake account.
 
-Set up WSL (Ubuntu) if on Windows.
+Ensure the target database (WEATHER_DB), schema (PIPELINE), and warehouse (COMPUTE_WH) exist.
 
-Create and activate a Python virtual environment:
+Create the target table if it doesn't exist:
 
-python3 -m venv venv
-source venv/bin/activate
+CREATE TABLE WEATHER_DB.PIPELINE.DAILY_WEATHER (
+    City VARCHAR,
+    Temperature_C FLOAT,
+    Humidity_Percent INT,
+    Description VARCHAR,
+    Timestamp_UTC TIMESTAMP_NTZ -- Ensure this matches the DataFrame
+);
 
-
-Install required libraries:
-
-pip install apache-airflow requests pandas "snowflake-connector-python[pandas]"
-
-
-Configure Credentials: Update the placeholder values in the CONFIGURATION section of weather_pipeline.py with your OpenWeatherMap API key and Snowflake account details.
-
-Snowflake Setup: Ensure the target database (WEATHER_DB), schema (PIPELINE), and table (DAILY_WEATHER) exist in your Snowflake account with the correct column structure.
 
 Airflow Setup:
 
-Initialize Airflow (e.g., airflow standalone).
+Initialize Airflow (e.g., using airflow standalone in your activated virtual environment).
 
-Copy weather_pipeline.py to the ~/airflow/dags/ folder in your Airflow environment.
+Copy the configured weather_pipeline.py to the ~/airflow/dags/ folder in your Airflow environment (WSL).
 
-Enable and trigger the weather_etl_pipeline DAG from the Airflow UI (http://localhost:8080).
+cp weather_pipeline.py ~/airflow/dags/
 
-Future Improvements
 
-Implement more robust error handling and alerting.
+Start/Restart airflow standalone.
 
-Add data quality checks.
+Access the Airflow UI (http://localhost:8080), find the weather_etl_pipeline DAG, unpause it (toggle switch), and trigger it manually (play button).
 
-Parameterize city list or Snowflake connection details.
+✨ Future Improvements
 
-Store raw data in a staging area (like AWS S3) before transformation.
+💡 Implement more detailed logging and monitoring within Airflow tasks.
+
+💡 Add notifications (e.g., email/Slack) for pipeline failures.
+
+💡 Incorporate data quality checks (e.g., using Great Expectations).
+
+💡 Parameterize configurations (cities, Snowflake details) using Airflow Variables or Connections.
+
+💡Introduce a staging layer (e.g., AWS S3) for raw data before transformation (ELT pattern).
+
+💡 Add unit/integration tests for pipeline tasks.
